@@ -20,17 +20,26 @@ import sys
 from pathlib import Path
 
 
-def build_index(source_dir: str) -> None:
-    from vector_store import build_vector_store
-    print(f"\n{'='*50}")
-    print("Building / Rebuilding Vector Index")
-    print(f"{'='*50}\n")
-    build_vector_store(source_dir)
+def build_index(source_dir: str, multimodal: bool = False) -> None:
+    if multimodal:
+        from multimodal_ingestion import build_multimodal_vector_store
+        print(f"\n{'='*50}")
+        print("Building / Rebuilding Multimodal Vector Index")
+        print("(Text + Images)")
+        print(f"{'='*50}\n")
+        build_multimodal_vector_store(source_dir, extract_images=True)
+    else:
+        from vector_store import build_vector_store
+        print(f"\n{'='*50}")
+        print("Building / Rebuilding Vector Index")
+        print(f"{'='*50}\n")
+        build_vector_store(source_dir)
+    
     print("\n✓ Index ready. You can now generate question papers.\n")
 
 
 def generate(topic: str, difficulty: str, num_mcq: int, num_short: int,
-             num_long: int, output: str | None) -> None:
+             num_long: int, output: str | None, rubric_criteria: list = None) -> None:
     from rag_pipeline import generate_question_paper
 
     print(f"\n{'='*50}")
@@ -44,7 +53,7 @@ def generate(topic: str, difficulty: str, num_mcq: int, num_short: int,
         num_mcq=num_mcq,
         num_short=num_short,
         num_long=num_long,
-        rubric_criteria=args.rubric,
+        rubric_criteria=rubric_criteria,
     )
 
     print("\n" + paper)
@@ -61,6 +70,10 @@ def main() -> None:
     parser.add_argument(
         "--build", action="store_true",
         help="(Re)build the FAISS index from files in --data-dir",
+    )
+    parser.add_argument(
+        "--multimodal", action="store_true",
+        help="Enable multimodal mode (extract and caption images from PDFs)",
     )
     parser.add_argument(
         "--data-dir", default="data",
@@ -80,7 +93,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.build:
-        build_index(args.data_dir)
+        build_index(args.data_dir, args.multimodal)
         return
 
     generate(
@@ -90,6 +103,7 @@ def main() -> None:
         num_short=args.num_short,
         num_long=args.num_long,
         output=args.output,
+        rubric_criteria=args.rubric,
     )
 
 

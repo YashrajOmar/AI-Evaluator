@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from vector_store import load_vector_store, retrieve_chunks
 from langchain_community.vectorstores import FAISS
+from balanced_retrieval import balanced_retrieve
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -239,9 +240,16 @@ def generate_question_paper(
         print("Loading vector store …")
         vector_store = load_vector_store()
 
-    # 2. Retrieve relevant chunks
-    print(f"Retrieving top-{k} chunks for topic: '{topic}' …")
-    chunks = retrieve_chunks(vector_store, topic, k=k)
+    # 2. Retrieve relevant chunks using balanced retrieval
+    print(f"Retrieving top-{k} chunks for topic: '{topic}' using balanced retrieval …")
+    chunks = balanced_retrieve(
+        vector_store=vector_store,
+        query=topic,
+        k=k,
+        difficulty=difficulty,
+        diversity_weight=0.7,  # Higher weight for multi-topic relevance
+        enable_difficulty_balance=False  # Keep topic balance priority
+    )
 
     if not chunks:
         return (
