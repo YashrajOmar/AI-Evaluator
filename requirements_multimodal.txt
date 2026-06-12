@@ -1,0 +1,18 @@
+# Multimodal RAG - Image Processing Requirements
+
+# PDF/Image Processing
+PyMuPDF>=1.23.0
+pdf2image>=1.16.3
+Pillow>=10.0.0
+
+# Vision-Language Models
+transformers>=4.35.0
+torch>=2.0.0
+accelerate>=0.24.0
+
+# BLIP Model Dependencies
+sentencepiece>=0.1.99
+protobuf>=3.20.0
+
+# Optional: For better performance
+bitsandbytes>=0.41.0  # For model quantization
