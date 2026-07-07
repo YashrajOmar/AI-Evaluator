@@ -1,10 +1,20 @@
+# Python
 venv/
 .venv/
+__pycache__/
+*.py[cod]
+
+# Environment files
+.env
+.env.local
+
+# Next.js
+.next/
+node_modules/
+
+# FAISS
 faiss_index/
-.env
-__pycache__/
-*.pyc
-*.pyo
-data/venv/
-__pycache__/
-.env
+
+# OS
+.DS_Store
+Thumbs.db

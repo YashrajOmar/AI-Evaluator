@@ -5,10 +5,6 @@ import json
 from typing import Dict, List, Optional
 from video_behavior import evaluate_semantic_robust, evaluate_visual_behavior
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 FILLER_WORDS = {"um", "uh", "like", "basically", "actually", "literally", "you know", "i mean", "so", "well", "hmm"}
 
 def clean_text(text: str) -> str:

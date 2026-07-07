@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Evaluator - Vapi Test</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #f4f4f9; display: flex; flex-direction: column; align-items: center; padding: 40px; }
+        .container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; max-width: 500px; width: 100%; }
+        video { width: 100%; border-radius: 8px; background: #000; margin-bottom: 15px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 5px; }
+        .btn-start { background: #0070f3; color: white; }
+        .btn-stop { background: #ff4d4f; color: white; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .status-text { margin-top: 20px; padding: 15px; background: #e6f7ff; border-left: 4px solid #1890ff; border-radius: 4px; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>AI Interview Stream Test</h2>
+        <video id="localVideo" autoplay muted></video>
+        
+        <div style="margin-bottom: 15px;">
+            <label for="roleDropdown"><strong>Interview Role:</strong></label>
+            <select id="roleDropdown" style="padding: 5px; border-radius: 4px;">
+                <option value="Software Development Engineer (SDE)">Software Development Engineer</option>
+                <option value="Full-Stack Developer">Full-Stack Developer</option>
+                <option value="AI Engineer">AI Engineer</option>
+                <option value="HR Operations Specialist">HR Operations Specialist</option>
+            </select>
+        </div>
+
+        <div>
+            <button id="startBtn" class="btn btn-start">Start Interview</button>
+            <button id="stopBtn" class="btn btn-stop" disabled>Stop</button>
+        </div>
+
+        <div id="statusText" class="status-text">
+            Status: Disconnected
+        </div>
+    </div>
+
+    <!-- THE FIX: We use type="module" to import the SDK properly -->
+    <script type="module">
+        import Vapi from "https://esm.sh/@vapi-ai/web";
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                document.getElementById('localVideo').srcObject = stream;
+            } catch (error) {
+                console.error("Camera error:", error);
+            }
+        }
+        startCamera();
+
+        // Initialize Vapi (No 'window.' needed anymore)
+        const vapi = new Vapi("880fb96a-d66a-4881-9f15-2c2c93d4ec27");
+
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const statusText = document.getElementById('statusText');
+
+        // startBtn.onclick = () => {
+        //     statusText.innerText = "Status: Connecting to AI...";
+        //     startBtn.disabled = true;
+            
+        //     const selectedRole = document.getElementById("roleDropdown").value;
+            
+        //     vapi.start("6cece3da-7657-4311-947d-520a96cecfec", {
+        //         assistantOverrides: {
+        //             variableValues: {
+        //                 role: selectedRole
+        //             }
+        //         }
+        //     });
+        // };
+        startBtn.onclick = () => {
+            statusText.innerText = "Status: Connecting to AI...";
+            startBtn.disabled = true;
+            
+            // Just the ID. No overrides.
+            vapi.start("6cece3da-7657-4311-947d-520a96cecfec"); 
+        };
+
+        stopBtn.onclick = () => {
+            vapi.stop();
+            statusText.innerText = "Status: Disconnected";
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        };
+
+        vapi.on("call-start", () => {
+            statusText.innerText = "Status: Interview in progress! Start talking.";
+            stopBtn.disabled = false;
+        });
+
+        vapi.on("call-end", () => {
+            statusText.innerText = "Status: Interview ended.";
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        });
+
+        vapi.on("error", (e) => {
+            console.error("Vapi Error:", e);
+            statusText.innerText = "Status: Error connecting.";
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>
