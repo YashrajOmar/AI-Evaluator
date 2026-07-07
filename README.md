@@ -175,11 +175,6 @@ http://localhost:8000
 
 ---
 
-
-
-
----
-
 # 🚀 AI Interview Evaluator Extension
 
 This repository has been extended with an AI-powered mock interview platform that conducts real-time voice interviews, evaluates candidate responses using Groq LLMs, analyzes facial composure using DeepFace, and generates comprehensive interview feedback.
